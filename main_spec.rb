@@ -3,6 +3,7 @@ require_relative 'main'
 require_relative './adapter/mysql/user_repository'
 require_relative './adapter/mysql/product_repository'
 require_relative './adapter/mysql/order_repository'
+require_relative './adapter/mysql/aggregate_root_repository'
 require_relative './usecase/purchase_product'
 
 describe "main" do
@@ -17,6 +18,7 @@ describe "main" do
   let(:user_repository) { UserRepository.new(client) }
   let(:product_repository) { ProductRepository.new(client) }
   let(:order_repository) { OrderRepository.new(client) }
+  let(:aggregate_root_repository) { AggregateRootRepository.new(client) }
 
   after do
     user_repository.delete_all
@@ -24,16 +26,32 @@ describe "main" do
     order_repository.delete_all
   end
 
-  context "when purchase product without lock" do
-    it "should oversell" do
+  before do
+    user_repository.create(User.new(1, 1000))
+    product_repository.create(Product.new(1, 10, 100))
+  end
 
-      user_repository.create(User.new(1, 1000))
-      product_repository.create(Product.new(1, 10, 100))
-
+  context "usecase control transaction" do
+    it "success" do
       threads = []
       2.times do
         threads << Thread.new do
           purchase_product_request(1, 1, 10)
+        end
+      end
+      threads.each(&:join)
+
+      expect(order_repository.find_by_user_id(1).size).to eq 2
+      expect(user_repository.find_by_id(1).points).to eq 800
+    end
+  end
+
+  context "repo controll transaction" do
+    it "success" do
+      threads = []
+      2.times do
+        threads << Thread.new do
+          purchase_product_request_repo(1, 1, 10)
         end
       end
       threads.each(&:join)
