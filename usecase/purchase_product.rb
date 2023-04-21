@@ -10,8 +10,8 @@ class PurchaseProduct
 
   def run(user_id, product_id, count)
     user_repository.transaction()
-    user = user_repository.lock(user_id)
-    product = product_repository.lock(product_id)
+    user = user_repository.find_by_id_with_lock(user_id)
+    product = product_repository.find_by_id_with_lock(product_id)
     total = product.price * count
     return unless user.can_purchase?(total)
     return unless product.can_purchase?(count)

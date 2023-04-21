@@ -16,7 +16,7 @@ class UserRepository < Repository
     User.new(result['id'], result['points'])
   end
 
-  def lock(id)
+  def find_by_id_with_lock(id)
     result = client.prepare("SELECT * FROM #{TABLE_NAME} WHERE id = ? FOR UPDATE")
                    .execute(id)
                    .first

@@ -14,7 +14,7 @@ def purchase_product_request(user_id, product_title, count)
   user_repository = UserRepository.new(mysql_client)
   product_repository = ProductRepository.new(mysql_client)
   order_repository = OrderRepository.new(mysql_client)
-  purchase_product = PurchaseProduct.new(user_repository, product_repository, order_repository)
+  purchase_product = PurchaseProduct.new(user_repository, product_repository, order_repository, nil)
 
   purchase_product.run(user_id, product_title, count)
 end
