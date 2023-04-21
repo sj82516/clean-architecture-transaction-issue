@@ -20,7 +20,7 @@ class PurchaseProduct
     sleep 1
 
     user.points -= total
-    product.amount -= count
+    product.stock -= count
 
     order = Order.new(user, product, count)
     user_repository.save(user)

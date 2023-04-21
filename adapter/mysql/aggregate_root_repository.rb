@@ -11,7 +11,7 @@ class AggregateRootRepository < Repository
     result = client.prepare("SELECT * FROM products WHERE id = ? FOR UPDATE")
                     .execute(product_id)
                     .first
-    product = Product.new(result['id'], result['price'], result['amount'])
+    product = Product.new(result['id'], result['price'], result['stock'])
 
     is_pass = yield(user, product, count)
     return unless is_pass
@@ -21,8 +21,8 @@ class AggregateRootRepository < Repository
     total = product.price * count
     client.prepare("UPDATE users SET points = ? WHERE id = ?")
           .execute(user.points - total, user.id)
-    client.prepare("UPDATE products SET amount = ? WHERE id = ?")
-          .execute(product.amount - count, product.id)
+    client.prepare("UPDATE products SET stock = ? WHERE id = ?")
+          .execute(product.stock - count, product.id)
 
     commit
   end

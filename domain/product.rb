@@ -1,13 +1,13 @@
 class Product
-  def initialize(id, price, amount)
+  def initialize(id, price, stock)
     self.id = id
     self.price = price
-    self.amount = amount
+    self.stock = stock
   end
 
-  attr_accessor :id, :price, :amount
+  attr_accessor :id, :price, :stock
 
   def can_purchase?(count)
-    amount >= count
+    stock >= count
   end
 end
